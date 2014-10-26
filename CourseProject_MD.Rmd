@@ -11,7 +11,7 @@ In this project, we compared the performance, in terms of miles per galon, betwe
 
 ### Data Preparation and Initial Analysis
 
-Initially, we uploaded the proper data, and found some basic statistics, identifying some possible factor variables. For example, number of cylinders, number of carburetors and number of forward gears can be used as factor variables into the regression models. In the codes below, we added labels "automatic" and "manual" to the factor variable transmission.
+Initially, we uploaded the proper data, found some basic statistics, and did some exploratory data analysis, identifying some possible factor variables. For example, number of cylinders, number of carburetors and number of forward gears can be used as factor variables into the regression models. In the codes below, we added labels "automatic" and "manual" to the factor variable transmission.
 
 ```{r, echo=TRUE, results='hide'}
 data(mtcars);
@@ -19,7 +19,7 @@ mtcars$gear <- factor(mtcars$gear);
 mtcars$cyl <- factor(mtcars$cyl);
 mtcars$am <- factor(mtcars$am, labels = c("automatic", "manual"));
 mtcars$carb <- factor(mtcars$carb);
-summary(mtcars);
+summary(mtcars); str(mtcars);
 ```
 
 ### Regression Models
@@ -33,12 +33,13 @@ We estimated a sequence of regression models starting from a more general especi
 The final model contained the variables number of cylinders, weight, hourse power and type of transmission as explanatory variables, as shown below:
 
 ```{r, eval=TRUE, echo = FALSE}
+m4 <- lm(mpg ~ factor(am) + factor(cyl) + wt + hp, data = mtcars); 
 summary(m4);
 ```
 
 As we can see from the results above, the estimated coefficient for manual transmission (against automatic transmission) resulted equal to 1.81. Therefore, all other important variables being kept equal (horsepower, weight and number of cylinders), there is an addition of 1.81 galons per miles in performance for manual cars, when compared to automatic ones. However, the estimated coefficiente is not statistically significant; the p-value is equal to 0.2065, and we do not reject the null hypothesis of null effect on MPG even with a test level of 10%. 
 
-Note that the initial regression, with only transmission type as an explanatory variable, had a highly significant and positive coefficient for the impact of manual transmision on MPG. On the other hand, the final regression, with important covariates included, did not show a positive significant effect anymore. Therefore, we have an indication of an important confounding effect of the other covariates in the model. In fact, as we can see from figure 2 in the appendix, automatic cars are in general heavier than manual ones. Besides, automatic cars also have a higher horsepower. Both weight and housepower impact negatively the MPG performance. Therefore, excluding both horsepower and weight from the regression may lead to the false conclusion that automatic transmission causes a lower value for MPG. The same argument applies to the number of cylinders as a confounding factor. 
+Note that the initial regression, with only transmission type as an explanatory variable, had a highly significant and positive coefficient for the impact of manual transmision on MPG. On the other hand, the final regression, with important covariates included, did not show a positive significant effect anymore. Therefore, we have an indication of an important confounding effect of the other covariates in the model. In fact, as we can see from figure 2 in the appendix, automatic cars are in general heavier than manual ones. Besides, automatic cars also have a higher horsepower. Both weight and housepower impact negatively the MPG performance. Therefore, excluding both horsepower and weight from the regression may lead to the false conclusion that automatic transmission causes a lower value for MPG. The same argument applies to the number of cylinders as a confounding factor. Figure 3 in the appendix present some residual plots.
 
 ---
 
@@ -75,7 +76,7 @@ summary(m4)
 
 #### Figure 1 - Initial plots
 
-```{r, echo=TRUE}
+```{r, echo=FALSE}
 par(mfrow = c(2,2), mar = c(4,4,2,1));
 
 with(mtcars, plot(wt, mpg, main = "Miles per galon vs weight"));
@@ -88,7 +89,7 @@ with(mtcars, boxplot(mpg ~ cyl, col = "green", ylab = "mpg",
 
 #### Figure 2 - Interpreting regression results
 
-```{r, echo=TRUE}
+```{r, echo=FALSE}
 par(mfrow = c(2,2), mar = c(4,4,2,1));
 
 with(mtcars, plot(wt, mpg, main = "Miles per galon vs weight", type="n"));
@@ -107,5 +108,12 @@ with(mtcars, boxplot(hp ~ am, col = "red", ylab = "hp",
                      main = "HP galon vs transmission"));
 ```
 
+#### Figure 3 - Residual plots
+
+```{r, echo=FALSE}
+par(mfrow = c(2,2), mar = c(4,4,2,1));
+m4 <- lm(mpg ~ factor(am) + factor(cyl) + wt + hp, data = mtcars); 
+plot(m4);
+```
 
 
